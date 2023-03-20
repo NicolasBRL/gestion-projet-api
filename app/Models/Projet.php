@@ -12,7 +12,7 @@ class Projet extends Model
 
     public function users()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsToMany(User::class, 'projets_par_utilisateurs');
     }
 
     public function taches()

@@ -11,9 +11,7 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = DB::table('users')
-            ->get()
-            ->toArray();
+        $users = User::with('projets')->get()->toArray();
 
         return response()->json([
             'status' => 'Success', 'data' => $users,
@@ -41,6 +39,7 @@ class UserController extends Controller
 
     public function show(User $user)
     {
+        $user->projets = $user->projets()->get()->toArray();
         return response()->json($user);
     }
 

@@ -12,9 +12,7 @@ class ProjetController extends Controller
 
     public function index()
     {
-        $projets = DB::table('projets')
-            ->get()
-            ->toArray();
+        $projets = Projet::with('users')->get()->toArray();
 
         return response()->json([
             'status' => 'Success', 
@@ -40,7 +38,7 @@ class ProjetController extends Controller
             'avancement' => $request->avancement,
         ]);
 
-        
+        $projet->users()->attach($request->user_id);
 
         return response()->json([
             'status' => 'Success', 
@@ -50,6 +48,7 @@ class ProjetController extends Controller
 
     public function show(Projet $projet)
     {
+        $projet->users = $projet->users()->get()->toArray();
         return response()->json($projet);
     }
 
@@ -66,6 +65,7 @@ class ProjetController extends Controller
         $updatedData = array_filter($request->all());
 
         $projet->update($updatedData);
+        $projet->users()->sync($request->user_id);
         
         return response()->json([
             'status' => 'Update Successfully', 
@@ -76,6 +76,7 @@ class ProjetController extends Controller
 
     public function destroy(Projet $projet)
     {
+        $projet->users()->detach();
         $projet->delete();
 
         return response()->json([

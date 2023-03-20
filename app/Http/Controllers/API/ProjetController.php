@@ -17,7 +17,8 @@ class ProjetController extends Controller
             ->toArray();
 
         return response()->json([
-            'status' => 'Success', 'data' => $projets,
+            'status' => 'Success', 
+            'data' => $projets,
         ]);
     }
 

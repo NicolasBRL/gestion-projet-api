@@ -38,8 +38,6 @@ class TacheController extends Controller
             'avancement' => $request->avancement,
         ]);
 
-        
-
         return response()->json([
             'status' => 'Success', 
             'data' => $tache,

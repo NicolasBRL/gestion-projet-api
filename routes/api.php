@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\ProjetController;
 use App\Http\Controllers\API\TacheController;
+use App\Http\Controllers\API\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -22,3 +23,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::apiResource('projets', ProjetController::class);
 Route::apiResource('taches', TacheController::class);
+Route::apiResource('users', UserController::class);

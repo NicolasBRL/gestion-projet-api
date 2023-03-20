@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('projets_par_taches', function (Blueprint $table) {
+        Schema::create('projets_par_utilisateurs', function (Blueprint $table) {
             $table->id();
 
             $table->bigInteger('projet_id')->unsigned();
@@ -20,10 +20,10 @@ return new class extends Migration
                 ->on('projets')
                 ->onDelete('cascade');
 
-            $table->bigInteger('tache_id')->unsigned();
-            $table->foreign('tache_id')
+            $table->bigInteger('user_id')->unsigned();
+            $table->foreign('user_id')
                 ->references('id')
-                ->on('taches')
+                ->on('users')
                 ->onDelete('cascade');
 
             $table->timestamps();
@@ -37,7 +37,7 @@ return new class extends Migration
     {
         Schema::table('projets_par_taches', function (Blueprint $table) { 
             $table->dropColumn('projet_id');
-            $table->dropColumn('tache_id');
+            $table->dropColumn('user_id');
         });
     }
 };

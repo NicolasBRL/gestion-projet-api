@@ -9,4 +9,9 @@ class Document extends Model
 {
     use HasFactory;
     protected $fillable = ['id', 'nom', 'url', 'tache_id'];
+
+    public function tache()
+    {
+        return $this->belongsTo(Tache::class);
+    }
 }

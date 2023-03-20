@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Document;
 use App\Models\Tache;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -11,12 +12,13 @@ class TacheController extends Controller
 {
     public function index()
     {
-        $taches = DB::table('taches')
+        $taches = Tache::with('projet', 'documents')
             ->get()
             ->toArray();
 
         return response()->json([
-            'status' => 'Success', 'data' => $taches,
+            'status' => 'Success', 
+            'data' => $taches,
         ]);
     }
 
@@ -28,6 +30,7 @@ class TacheController extends Controller
             'date_debut' => 'required|date',
             'date_fin' => 'required|date',
             'avancement' => 'required|integer',
+            'projet_id' => 'required',
         ]);
 
         $tache = Tache::create([
@@ -36,7 +39,26 @@ class TacheController extends Controller
             'date_debut' => $request->date_debut,
             'date_fin' => $request->date_fin,
             'avancement' => $request->avancement,
+            'projet_id' => $request->projet_id,
         ]);
+
+        if($request->has('file')){
+            $file = $request->file;
+            
+            $filenameWithExt = $file->getClientOriginalName();
+            $filenameWithoutExt = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+
+            $extension = $file->getClientOriginalExtension();
+            $filename = $filenameWithoutExt . '_' . time() . '.' . $extension;
+
+            $path = $file->storeAs('public/uploads', $filename);
+
+            $document = Document::create([
+                'nom' => $filenameWithoutExt,
+                'url' => $path,
+                'tache_id' => $tache->id
+            ]);
+        }
 
         return response()->json([
             'status' => 'Success', 
@@ -46,6 +68,8 @@ class TacheController extends Controller
 
     public function show(Tache $tach)
     {
+        $tach->projet = $tach->projet()->get()->toArray();
+        $tach->documents = $tach->documents()->get()->toArray();
         return response()->json($tach);
     }
 
@@ -57,12 +81,34 @@ class TacheController extends Controller
             'date_debut' => 'date',
             'date_fin' => 'date',
             'avancement' => 'integer',
+            'projet_id' => '',
         ]);
 
         $updatedData = array_filter($request->all());
 
         $tach->update($updatedData);
         
+        if($request->has('file')){
+            $documents = Document::where('tache_id', $tach->id);
+            $documents->delete();
+
+            foreach ($request->file as $file) {
+                $filenameWithExt = $file->getClientOriginalName();
+                $filenameWithoutExt = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+
+                $extension = $file->getClientOriginalExtension();
+                $filename = $filenameWithoutExt . '_' . time() . '.' . $extension;
+
+                $path = $file->storeAs('public/uploads', $filename);
+
+                $document = Document::create([
+                    'nom' => $filenameWithoutExt,
+                    'url' => $path,
+                    'tache_id' => $tach->id
+                ]);
+            }
+        }
+
         return response()->json([
             'status' => 'Update Successfully', 
             'data' => $tach,

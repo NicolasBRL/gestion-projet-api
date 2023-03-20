@@ -12,7 +12,7 @@ class ProjetController extends Controller
 
     public function index()
     {
-        $projets = Projet::with('users')->get()->toArray();
+        $projets = Projet::with('users', 'taches')->get()->toArray();
 
         return response()->json([
             'status' => 'Success', 
@@ -49,6 +49,7 @@ class ProjetController extends Controller
     public function show(Projet $projet)
     {
         $projet->users = $projet->users()->get()->toArray();
+        $projet->taches = $projet->taches()->get()->toArray();
         return response()->json($projet);
     }
 

@@ -18,6 +18,13 @@ return new class extends Migration
             $table->date('date_debut');
             $table->date('date_fin');
             $table->integer('avancement');
+
+            $table->bigInteger('projet_id')->unsigned();
+            $table->foreign('projet_id')
+                ->references('id')
+                ->on('projets')
+                ->onDelete('cascade');
+
             $table->timestamps();
         });
     }
@@ -27,6 +34,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('taches');
+        Schema::table('taches', function (Blueprint $table) { 
+            $table->dropColumn('projet_id');
+        });
     }
 };

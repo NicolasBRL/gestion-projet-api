@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -23,12 +24,15 @@ class UserController extends Controller
         $request->validate([
             'nom' => 'required|max:250',
             'prenom' => 'required|max:250',
+            'email' => 'required|max:250',
+            'password' => 'required|max:250',
         ]);
 
         $user = User::create([
             'nom' => $request->nom,
             'prenom' => $request->prenom,
-            
+            'email' => $request->email,
+            'password' => Hash::make($request->password)
         ]);
 
         return response()->json([
@@ -48,10 +52,14 @@ class UserController extends Controller
         $request->validate([
             'nom' => 'max:250',
             'prenom' => 'max:250',
+            'email' => 'max:250',
+            'password' => 'max:250',
         ]);
 
         $updatedData = array_filter($request->all());
-        $user->update($updatedData);
+        $user->update(array_merge($updatedData, [
+            'password' => Hash::make($request->password)
+        ]));
         
         return response()->json([
             'status' => 'Update Successfully', 
